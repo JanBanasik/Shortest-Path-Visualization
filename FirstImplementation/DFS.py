@@ -1,7 +1,7 @@
 
 def DFS(graph: dict[int, list[int]], source: int, n: int):
-    stack = [source]
-
+    stack = [(source, 0)]
+    dist = {source: 0}
     visited = [False] * n
     visited[source] = True
 

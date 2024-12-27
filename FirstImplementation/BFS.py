@@ -2,7 +2,7 @@ from collections import deque
 
 
 def BFS(graph: dict[int, list[int]], source: int, n: int):
-    q = deque([source])
+    q = deque([source, 0])
 
     visited = [False] * n
     visited[source] = True
