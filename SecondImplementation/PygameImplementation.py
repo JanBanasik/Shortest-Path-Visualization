@@ -19,6 +19,8 @@ legend_texts = [
     "'I' - Dijkstra's Algorithm",
     "'C' - Clear Grid",
 ]
+
+
 def draw_legend(win):
     """
     Wyświetla legendę dla klawiszy odpowiadających za różne algorytmy.
@@ -27,6 +29,7 @@ def draw_legend(win):
     for line in legend_texts:
         draw_label(win, line, x, y)
         y += 30  # Odstęp między liniami
+
 
 def draw_label(win, text, x, y):
     label = FONT.render(text, True, Color.PURPLE.value)
@@ -64,7 +67,6 @@ def draw(win, grid, rows, width, current_algorithm):
     pygame.display.update()
 
 
-
 def get_clicked_pos(pos, rows, width):
     gap = width // rows
     x, y = pos
@@ -87,12 +89,12 @@ def main(win, width):
 
     run = True
 
-    current_algorithm = "None"  # Zmienna przechowująca nazwę algorytmu
+    current_algorithm = "None"
 
     algorithmDictionary = AlgorithmDictionary()
 
     while run:
-        draw(win, grid, ROWS, width, current_algorithm)  # Aktualizuj tylko siatkę
+        draw(win, grid, ROWS, width, current_algorithm)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -100,6 +102,8 @@ def main(win, width):
             if pygame.mouse.get_pressed()[0]:  # LEFT
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, width)
+                if not (0 <= row < ROWS and 0 <= col < ROWS):
+                    continue
                 node: Node = grid[row][col]
 
                 if not start and node != end:
