@@ -50,4 +50,3 @@ class BFSAlgorithm(PathFindingAlgorithm):
 
         print("No path found!")
         return False
-

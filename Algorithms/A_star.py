@@ -10,13 +10,14 @@ def h(p1, p2):
     return abs(x1 - x2) + abs(y1 - y2)
 
 
-class AStarAlgorithm(PathFindingAlgorithm):
+def reconstruct_path(came_from, current, draw):
+    while current in came_from:
+        current = came_from[current]
+        current.make_path()
+        draw()
 
-    def reconstruct_path(self, came_from, current, draw):
-        while current in came_from:
-            current = came_from[current]
-            current.make_path()
-            draw()
+
+class AStarAlgorithm(PathFindingAlgorithm):
 
     def findPath(self, draw, grid, start, end):
         for row in grid:
@@ -40,7 +41,7 @@ class AStarAlgorithm(PathFindingAlgorithm):
             current = pq.get()[2]
             open_set_hash.remove(current)
             if current == end:
-                self.reconstruct_path(came_from, end, draw)
+                reconstruct_path(came_from, end, draw)
                 end.make_end()
                 start.make_start()
                 return True

@@ -1,9 +1,5 @@
 import pygame
 
-from Algorithms.A_star import AStarAlgorithm
-from Algorithms.BFS_algorithm import BFSAlgorithm
-from Algorithms.DFS_algorithm import DFSAlgorithm
-from Algorithms.Dijkstra_algorithm import DijkstraAlgorithm
 from AlgorithmDictionary import AlgorithmDictionary
 from Node import Node
 from Colors import Color
@@ -13,10 +9,27 @@ WIN = pygame.display.set_mode((WIDTH, WIDTH))
 pygame.display.set_caption('Shortest Path Visualization')
 
 pygame.font.init()
-FONT = pygame.font.SysFont('Arial', 24)
+FONT = pygame.font.SysFont('Arial', 30)
+
+legend_texts = [
+    "Legend:",
+    "'A' - A* Algorithm",
+    "'B' - Breadth-First Search",
+    "'D' - Depth-First Search",
+    "'I' - Dijkstra's Algorithm",
+    "'C' - Clear Grid",
+]
+def draw_legend(win):
+    """
+    Wyświetla legendę dla klawiszy odpowiadających za różne algorytmy.
+    """
+    x, y = 10, 50  # Pozycja startowa legendy
+    for line in legend_texts:
+        draw_label(win, line, x, y)
+        y += 30  # Odstęp między liniami
 
 def draw_label(win, text, x, y):
-    label = FONT.render(text, True, Color.BLACK.value)
+    label = FONT.render(text, True, Color.PURPLE.value)
     win.blit(label, (x, y))
 
 
@@ -38,13 +51,18 @@ def draw_grid(win, rows, width) -> None:
         pygame.draw.line(win, Color.BLACK.value, (i * gap, 0), (i * gap, width))
 
 
-def draw(win, grid, rows, width):
+def draw(win, grid, rows, width, current_algorithm):
     win.fill(Color.WHITE.value)
     for row in grid:
         for node in row:
             node.draw(win)
     draw_grid(win, rows, width)
+    if current_algorithm != "None":
+        draw_label(win, f"Algorithm: {current_algorithm}", 10, 10)  # Rysuj napis w każdej iteracji
+    if current_algorithm == "None":
+        draw_legend(win)
     pygame.display.update()
+
 
 
 def get_clicked_pos(pos, rows, width):
@@ -72,11 +90,9 @@ def main(win, width):
     current_algorithm = "None"  # Zmienna przechowująca nazwę algorytmu
 
     algorithmDictionary = AlgorithmDictionary()
-    while run:
-        draw(win, grid, ROWS, width)
-        draw_label(win, f"Algorithm: {current_algorithm}", 10, 10)  # Wyświetlanie nazwy algorytmu
-        pygame.display.update()
 
+    while run:
+        draw(win, grid, ROWS, width, current_algorithm)  # Aktualizuj tylko siatkę
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -106,18 +122,23 @@ def main(win, width):
                     end = None
 
             if event.type == pygame.KEYDOWN:
-                if event.key in algorithmDictionary.dictionary:
+                if event.key in algorithmDictionary.dictionary and start and end:
                     clearBefore(grid)
-                    draw(win, grid, ROWS, width)
+                    draw(win, grid, ROWS, width, current_algorithm)  # Aktualizuj siatkę
                     current_algorithm = algorithmDictionary.dictionary[event.key].name
+                    draw_label(win, f"Algorithm: {current_algorithm}", 10, 10)  # Aktualizuj napis
+                    pygame.display.update()  # Aktualizuj ekran po zmianie napisu
                     algorithm = algorithmDictionary.dictionary[event.key].algorithm
-                    algorithm.findPath(lambda: draw(win, grid, ROWS, width), grid, start, end)
+                    algorithm.findPath(lambda: draw(win, grid, ROWS, width, current_algorithm), grid, start, end)
 
                 if event.key == pygame.K_c:
                     start = None
                     end = None
                     current_algorithm = "None"
                     grid = make_grid(ROWS, width)
+                    win.fill(Color.WHITE.value)  # Wyczyść ekran
+                    draw_label(win, f"Algorithm: {current_algorithm}", 10, 10)  # Narysuj napis od nowa
+                    pygame.display.update()  # Aktualizuj ekran
 
     pygame.quit()
 

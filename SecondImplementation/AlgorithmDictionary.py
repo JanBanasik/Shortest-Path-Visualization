@@ -7,18 +7,19 @@ import pygame
 
 
 class AlgorithmWithName:
-    def __init__(self, algorithm, name):
+    def __init__(self, algorithm, name, letter):
         self.algorithm = algorithm
         self.name = name
+        self.letter = letter
+
 
 
 def create_key_mapping():
     pygame.init()  # Inicjalizacja Pygame, jeśli jeszcze tego nie zrobiłeś
     key_mapping = {}
 
-    # Iteracja po literach alfabetu
     for letter in "abcdefghijklmnopqrstuvwxyz":
-        key_constant = getattr(pygame, f"K_{letter}")  # Pobieramy stałą pygame.K_a, pygame.K_b, itd.
+        key_constant = getattr(pygame, f"K_{letter}")
         key_mapping[letter] = key_constant
 
     return key_mapping
@@ -37,14 +38,11 @@ class AlgorithmDictionary:
     def constructDictionary(self):
         for subclass in PathFindingAlgorithm.__subclasses__():
             algorithm = subclass()
-            print(f"Name: {subclass.__name__}")
             for letter in subclass.__name__:
                 if self.keyMapping[letter.lower()] not in self.dictionary:
-                    self.dictionary[self.keyMapping[letter.lower()]] = AlgorithmWithName(algorithm, subclass.__name__)
+                    self.dictionary[self.keyMapping[letter.lower()]] = AlgorithmWithName(algorithm, subclass.__name__, letter)
                     break
 
 
 # Tworzenie instancji
 r = AlgorithmDictionary()
-for el in r.dictionary:
-    print(r.dictionary[el].name)
