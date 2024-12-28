@@ -2,7 +2,6 @@ import pygame
 from Colors import Color
 
 
-
 class Node:
     def __init__(self, row, col, width, total_rows):
         self.row = row
@@ -30,7 +29,10 @@ class Node:
         return self.color == Color.ORANGE.value
 
     def is_end(self):
-        return self.color == Color.PURPLE
+        return self.color == Color.PURPLE.value
+
+    def is_path(self):
+        return self.color == Color.BLUE.value
 
     def reset(self):
         self.color = Color.WHITE.value
@@ -67,3 +69,6 @@ class Node:
 
     def __lt__(self, other):
         return False
+
+    def __hash__(self):
+        return hash((self.x, self.y))

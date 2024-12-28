@@ -1,6 +1,10 @@
 import pygame
 
-from Algorithms.A_star import A_star_algorithm
+from Algorithms.A_star import AStarAlgorithm
+from Algorithms.BFS_algorithm import BFSAlgorithm
+from Algorithms.DFS_algorithm import DFSAlgorithm
+from Algorithms.Dijkstra_algorithm import DijkstraAlgorithm
+from AlgorithmDictionary import AlgorithmDictionary
 from Node import Node
 from Colors import Color
 
@@ -8,9 +12,15 @@ WIDTH = 800
 WIN = pygame.display.set_mode((WIDTH, WIDTH))
 pygame.display.set_caption('Shortest Path Visualization')
 
+pygame.font.init()
+FONT = pygame.font.SysFont('Arial', 24)
+
+def draw_label(win, text, x, y):
+    label = FONT.render(text, True, Color.BLACK.value)
+    win.blit(label, (x, y))
 
 
-def make_grid(rows, width):
+def make_grid(rows, width) -> list[list[Node]]:
     grid = []
     gap = width // rows
     for i in range(rows):
@@ -21,7 +31,7 @@ def make_grid(rows, width):
     return grid
 
 
-def draw_grid(win, rows, width):
+def draw_grid(win, rows, width) -> None:
     gap = width // rows
     for i in range(rows):
         pygame.draw.line(win, Color.BLACK.value, (0, i * gap), (width, i * gap))
@@ -43,6 +53,13 @@ def get_clicked_pos(pos, rows, width):
     return x // gap, y // gap
 
 
+def clearBefore(grid: list[list[Node]]) -> None:
+    for row in grid:
+        for node in row:
+            if node.is_open() or node.is_closed() or node.is_path():
+                node.reset()
+
+
 def main(win, width):
     ROWS = 50
     grid = make_grid(ROWS, width)
@@ -52,8 +69,14 @@ def main(win, width):
 
     run = True
 
+    current_algorithm = "None"  # Zmienna przechowująca nazwę algorytmu
+
+    algorithmDictionary = AlgorithmDictionary()
     while run:
         draw(win, grid, ROWS, width)
+        draw_label(win, f"Algorithm: {current_algorithm}", 10, 10)  # Wyświetlanie nazwy algorytmu
+        pygame.display.update()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -61,7 +84,7 @@ def main(win, width):
             if pygame.mouse.get_pressed()[0]:  # LEFT
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, width)
-                node = grid[row][col]
+                node: Node = grid[row][col]
 
                 if not start and node != end:
                     start = node
@@ -83,13 +106,17 @@ def main(win, width):
                     end = None
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a and start and end:
-
-                    A_star_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
+                if event.key in algorithmDictionary.dictionary:
+                    clearBefore(grid)
+                    draw(win, grid, ROWS, width)
+                    current_algorithm = algorithmDictionary.dictionary[event.key].name
+                    algorithm = algorithmDictionary.dictionary[event.key].algorithm
+                    algorithm.findPath(lambda: draw(win, grid, ROWS, width), grid, start, end)
 
                 if event.key == pygame.K_c:
                     start = None
                     end = None
+                    current_algorithm = "None"
                     grid = make_grid(ROWS, width)
 
     pygame.quit()
